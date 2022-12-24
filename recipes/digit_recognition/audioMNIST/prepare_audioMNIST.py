@@ -1,11 +1,11 @@
 """
-Downloads and creates data manifest files for Mini LibriSpeech (spk-id).
-For speaker-id, different sentences of the same speaker must appear in train,
-validation, and test sets. In this case, these sets are thus derived from
-splitting the original training set intothree chunks.
+Downloads and creates data manifest files for Audio MNIST (spoken digit recognition).
+
+Edit of the template in speechbrain/templates/speaker_id
 
 Authors:
- * Mirco Ravanelli, 2021
+ * Mirco Ravanelli 2021
+ * Massimo Rizzoli 2022
 """
 
 import os
@@ -52,7 +52,7 @@ def prepare_audioMNIST(
 
     Example
     -------
-    >>> data_folder = '/path/to/audioMNIST'
+    >>> data_folder = '/path/to/AudioMNIST'
     >>> prepare_audioMNIST(data_folder, 'train.json', 'valid.json', 'test.json')
     """
 
@@ -223,7 +223,7 @@ def download_audioMNIST(destination):
     Arguments
     ---------
     destination : str
-        Place to put dataset.
+        Place to put the dataset.
     """
     archive = os.path.join(destination, "free-spoken-digit-dataset-1.0.10.tar.gz")
     download_file(AUDIOMNIST_URL, archive)
@@ -231,5 +231,4 @@ def download_audioMNIST(destination):
 
 
 if __name__ == "__main__":
-    # prepare_audioMNIST(".", "train.json", "valid.json", "test.json", split_ratio=[70,10,20])
     prepare_audioMNIST(".", "train.json", "valid.json", "test.json")

@@ -1,28 +1,18 @@
 #!/usr/bin/env python3
-"""Recipe for training a speaker-id system. The template can use used as a
-basic example for any signal classification task such as language_id,
-emotion recognition, command classification, etc. The proposed task classifies
-28 speakers using Mini Librispeech. This task is very easy. In a real
-scenario, you need to use datasets with a larger number of speakers such as
-the voxceleb one (see recipes/VoxCeleb). Speechbrain has already some built-in
-models for signal classifications (see the ECAPA one in
-speechbrain.lobes.models.ECAPA_TDNN.py or the xvector in
-speechbrain/lobes/models/Xvector.py)
-
+"""Recipe for training a spoken digit recognition system. The proposed task classifies
+10 digits uttered by 6 different speakers, using Audio MNIST.
 To run this recipe, do the following:
-> python train.py train.yaml
-
-To read the code, first scroll to the bottom to see the "main" code.
-This gives a high-level overview of what is going on, while the
-Brain class definition provides the details of what happens
-for each batch during training.
+> python train.py hparams.yaml
 
 The first time you run it, this script should automatically download
-and prepare the Mini Librispeech dataset for computation. Noise and
+and prepare the Audio MNIST dataset for computation. Noise and
 reverberation are automatically added to each sample from OpenRIR.
+
+Edit of the template in speechbrain/templates/speaker_id
 
 Authors
  * Mirco Ravanelli 2021
+ * Massimo Rizzoli 2022
 """
 import os
 import sys
@@ -58,7 +48,7 @@ class SpkIdBrain(sb.Brain):
 
         # Compute features, embeddings, and predictions
         feats, lens = self.prepare_features(batch.sig, stage)
-        embeddings = self.modules.embedding_model(feats, lens)
+        embeddings = self.modules.embedding_model(feats)
         predictions = self.modules.classifier(embeddings)
 
         return predictions
@@ -215,7 +205,7 @@ def dataio_prep(hparams):
     Arguments
     ---------
     hparams : dict
-        This dictionary is loaded from the `train.yaml` file, and it includes
+        This dictionary is loaded from the `hparams.yaml` file, and it includes
         all the hyperparameters needed for dataset construction and loading.
 
     Returns
@@ -237,15 +227,6 @@ def dataio_prep(hparams):
         This is done on the CPU in the `collate_fn`."""
         sig = sb.dataio.dataio.read_audio(wav)
         return sig
-
-    # Define label pipeline:
-    # @sb.utils.data_pipeline.takes("spk_id")
-    # @sb.utils.data_pipeline.provides("spk_id", "spk_id_encoded")
-    # def label_pipeline(spk_id):
-    #     """Defines the pipeline to process the input speaker label."""
-    #     yield spk_id
-    #     spk_id_encoded = label_encoder.encode_label_torch(spk_id)
-    #     yield spk_id_encoded
 
     # Define label pipeline:
     @sb.utils.data_pipeline.takes("digit")
@@ -314,7 +295,7 @@ if __name__ == "__main__":
             "save_json_train": hparams["train_annotation"],
             "save_json_valid": hparams["valid_annotation"],
             "save_json_test": hparams["test_annotation"],
-            "split_ratio": [80, 10, 10],
+            "split_ratio": hparams["split_ratio"]
         },
     )
 
